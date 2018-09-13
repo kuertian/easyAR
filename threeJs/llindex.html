@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>立方体</title>
+    <script src="http://sqimg.qq.com/qq_product_operations/mma/javanli_test/lib/three.min.js"></script>
+<!--      <script src="assets/libs/geometry/DodecahedronGeometry.js"></script> -->
+    <script src="assets/js/build/three.js"></script>
+    <script src="assets/js/libs/inflate.min.js"></script>
+    <script src="assets/js/loaders/FBXLoader.js"></script>
+    <script src="assets/js/controls/OrbitControls.js"></script>
+     <script src="assets/js/Detector.js"></script>
+      <script src="assets/js/libs/stats.min.js"></script>
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #three_canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<canvas id="three_canvas"></canvas>
+<script>
+    var renderer, camera, scene, light, object;
+    var width, height;
+    function initRenderer() {
+        width = document.getElementById('three_canvas').clientWidth;
+        height = document.getElementById('three_canvas').clientHeight;
+        renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('three_canvas')
+        });
+        renderer.setSize(width, height);
+        renderer.setClearColor(0xFFFFFF, 1.0);
+    }
+
+    function initCamera() {
+        camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000);
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.position.z = 200;
+        camera.up.x = 0;
+        camera.up.y = 1;
+        camera.up.z = 0;
+        camera.lookAt({
+            x: 0,
+            y: 0,
+            z: 0
+        });
+
+    }
+    function initScene() {
+        scene = new THREE.Scene();
+    }
+
+    function initLight(){
+        var light = new THREE.DirectionalLight(0xffffff);
+        light.position.set(0,1,1).normalize();
+        scene.add(light);
+    }
+
+    function initObject() {
+        /*初始代码
+        // var geometry = new THREE.CubeGeometry(100, 100, 100);
+        // object = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
+        // scene.add(object);
+        */
+        /*六个面贴图
+        // var geometry =new THREE.CubeGeometry(100,100,100);
+        // var material1 =new THREE.MeshPhongMaterial({
+        //      //ambient: 0x050505, color: 0x0033ff, specular: 0x555555, shininess: 30
+        //      map: THREE.ImageUtils.loadTexture('http://127.0.01/threeJs/material/crate.jpg')
+        // });
+        // var material2 =new THREE.MeshPhongMaterial({         
+        //      map: THREE.ImageUtils.loadTexture('http://127.0.01/threeJs/material/crate1.jpg')
+        // });
+        // var material3 =new THREE.MeshPhongMaterial({         
+        //      map: THREE.ImageUtils.loadTexture('http://127.0.01/threeJs/material/crate2.jpg')
+        // });
+        //  var material4 =new THREE.MeshPhongMaterial({         
+        //      map: THREE.ImageUtils.loadTexture('http://127.0.01/threeJs/material/crate3.jpg')
+        // });
+        // var material5 =new THREE.MeshPhongMaterial({         
+        //      map: THREE.ImageUtils.loadTexture('http://127.0.01/threeJs/material/crate4.jpg')
+        // });
+        // var material6 =new THREE.MeshPhongMaterial({         
+        //      map: THREE.ImageUtils.loadTexture('http://127.0.01/threeJs/material/crate5.jpg')
+        // });
+
+        // var materials = [material1,material2,material3,material4,material5,material6];
+        // var meshFaceMaterial = new THREE.MeshFaceMaterial(materials);
+
+        // object = new THREE.Mesh(geometry,meshFaceMaterial);
+        */
+        //model
+        var loader = new THREE.FBXLoader();
+        loader.load('material/trex_v4.fbx', function(object){
+
+                object.mixer = new THREE.AnimationMixer( object );
+                mixers.push( object.mixer );
+                var action = object.mixer.clipAction( object.animations[ 0 ] );
+                action.play();
+                object.traverse( function ( child ) {
+                    if ( child.isMesh ) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                } );
+
+                scene.add(object);
+        });
+       
+
+    }
+    function render() {
+        requestAnimationFrame(render);
+        object.rotation.x += 0.05;
+        object.rotation.y += 0.05;
+        renderer.render(scene, camera);
+    }
+    function threeStart() {
+        initRenderer();
+        initCamera();
+        initScene();
+        initLight();
+        initObject();
+        render();
+    }
+    window.onload = threeStart();
+</script>
+</body>
+</html>
